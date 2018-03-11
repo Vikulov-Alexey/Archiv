@@ -9,28 +9,77 @@
 int main(int argc,char *argv[])
 {
 	char nameF[sizeName];
-	int r,w;
 	int sizeF[1];
 	char buf[1];
-	int n;
-	r=open(argv[1],O_RDONLY);
+	int r=open(argv[1],O_RDONLY);
 	if(argc!=2)
-		printf("Не введено название архива\n");
+	{
+		printf("Некорректное название архива\n");
+		close(r);		
+		return 1;		
+	}
+	if(r<0)
+	{
+		printf("Ошибка открытия\n");
+		return 1;		
+	}
 	while(1)
 	{
-		n=read(r,&nameF,sizeName);
-		if(n<1)
+		int n=read(r,&nameF,sizeName);
+		if(n<sizeName)
 			break;
-		w=open(nameF,O_WRONLY|O_CREAT,0664);
-		read(r,&sizeF,sizeof(int));
+		int w=open(nameF,O_WRONLY|O_CREAT,0664);
+		if(w<0)
+		{
+			printf("Ошибка\n");
+			close(r);
+			close(w);
+			return 1;		
+		}
+		int err=read(r,&sizeF,sizeof(int));
+		if(err<0)
+		{
+			printf("Ошибка чтения\n");
+			close(r);
+			close(w);
+			return 1;		
+		}
 		while(sizeF[0]>1)
 		{
-			read(r,&buf,1);
-			write(w,&buf,1);
+			err=read(r,&buf,1);
+			if(err<0)
+			{
+				printf("Ошибка чтения\n");
+				close(r);
+				close(w);
+				return 1;		
+			}
+			err=write(w,&buf,1);
+			if(err<0)
+			{
+				printf("Ошибка записи\n");
+				close(r);
+				close(w);
+				return 1;		
+			}
 			sizeF[0]=sizeF[0]-1;
 		}
-		read(r,&buf,sizeF[0]);
-		write(w,&buf,sizeF[0]);
+		err=read(r,&buf,sizeF[0]);
+		if(err<0)
+		{
+			printf("Ошибка чтения\n");
+			close(r);
+			close(w);
+			return 1;		
+		}
+		err=write(w,&buf,sizeF[0]);
+		if(err<0)
+		{
+			printf("Ошибка записи\n");
+			close(r);
+			close(w);
+			return 1;		
+		}
 		close(w);
 	}
 	close(r);
