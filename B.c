@@ -4,7 +4,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #define sizeName 128
-#define sizeSize 10
 
 int main(int argc,char *argv[])
 {
