@@ -7,12 +7,9 @@
 
 int main(int argc,char *argv[])
 {
-	struct stat st;
-	char name[sizeName]; //хранит текущее имя
 	int i=1;
 	int w=0,r=0;
 	int sizeRA;
-	int stat;
 	char buf[1];
 	long err;
 
